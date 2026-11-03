@@ -28,11 +28,11 @@ export default function AppCard({ app }: { app: App }) {
     <img
       src={app.logo_path}
       alt={app.name}
-      className="h-10 w-10 rounded-xl object-cover"
+      className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-cover"
     />
   ) : (
     <span
-      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-semibold ${color}`}
+      className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl font-semibold text-xs sm:text-sm ${color}`}
     >
       {app.name.charAt(0).toUpperCase()}
     </span>
@@ -43,12 +43,12 @@ export default function AppCard({ app }: { app: App }) {
     : "Revenue not disclosed";
 
   return (
-    <div className="border border-slate-200 rounded-2xl p-4 mb-3 bg-white hover:border-blue-300 hover:shadow-lg transition-all duration-200">
-      <div className="flex items-start gap-3">
+    <div className="border border-slate-200 rounded-2xl p-3 sm:p-4 mb-2 sm:mb-3 bg-white hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+      <div className="flex items-start gap-2 sm:gap-3">
         {logo}
 
         <div className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-slate-900">
+          <span className="block text-xs sm:text-sm font-semibold text-slate-900">
             {app.name}
           </span>
           <span className="mt-1 block text-xs text-blue-600 font-medium">
@@ -62,8 +62,8 @@ export default function AppCard({ app }: { app: App }) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-start justify-between gap-3">
-        <p className="text-sm leading-6 text-slate-600 flex-1">
+      <div className="mt-2 sm:mt-3 flex items-start justify-between gap-2 sm:gap-3">
+        <p className="text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600 flex-1">
           {app.growth_story}
         </p>
         {app.website_url && (
@@ -71,7 +71,7 @@ export default function AppCard({ app }: { app: App }) {
             href={app.website_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 inline-flex items-center justify-center rounded-lg p-2 text-blue-500 transition hover:text-blue-600 hover:bg-slate-50 cursor-pointer"
+            className="mt-1 inline-flex items-center justify-center rounded-lg p-1.5 sm:p-2 text-blue-500 transition hover:text-blue-600 hover:bg-slate-50 cursor-pointer"
             aria-label={`Visit ${app.name}`}
           >
             <svg
@@ -79,7 +79,7 @@ export default function AppCard({ app }: { app: App }) {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className="h-5 w-5"
+              className="h-4 w-4 sm:h-5 sm:w-5"
               aria-hidden="true"
             >
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />

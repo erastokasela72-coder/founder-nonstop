@@ -33,18 +33,18 @@ export default function TipCard({ post }: { post: Post }) {
     : String(currentSlideData);
 
   return (
-    <article className="border border-slate-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200">
-      <h2 className="text-base font-bold leading-6 text-slate-900">
+    <article className="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-white shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200">
+      <h2 className="text-sm sm:text-base font-bold leading-6 text-slate-900">
         {post.title}
       </h2>
 
       <div className="mt-3">
         {subtitle && (
-          <h3 className="text-sm font-bold text-slate-800 mb-2">
+          <h3 className="text-xs sm:text-sm font-bold text-slate-800 mb-2">
             {subtitle}
           </h3>
         )}
-        <p className="text-sm leading-7 text-slate-600">
+        <p className="text-xs sm:text-sm leading-6 sm:leading-7 text-slate-600">
           {content}
         </p>
 
@@ -53,7 +53,7 @@ export default function TipCard({ post }: { post: Post }) {
             <button
               onClick={prevSlide}
               disabled={currentSlide === 0}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
+              className="rounded-lg border border-slate-200 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
             >
               ← Previous
             </button>
@@ -63,7 +63,7 @@ export default function TipCard({ post }: { post: Post }) {
             <button
               onClick={nextSlide}
               disabled={currentSlide === slides.length - 1}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
+              className="rounded-lg border border-slate-200 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
             >
               Next →
             </button>
