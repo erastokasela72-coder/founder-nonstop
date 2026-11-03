@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import TipCard from "@/app/components/TipCard";
 import AppCard from "@/app/components/AppCard";
+import MobileContent from "@/app/components/MobileContent";
 import { Metadata } from "next";
 
 export const instant = false;
@@ -75,42 +76,44 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] md:gap-10 md:py-10 lg:grid-cols-[minmax(0,1fr)_minmax(360px,1.4fr)_minmax(0,1fr)] lg:gap-12 lg:px-8 lg:py-12 items-start">
-        <aside className="order-1 lg:order-1">
-          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-slate-500 mb-3 sm:mb-4">
-            Apps
-          </h2>
+      <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-12">
+        {/* Logo and description - centered on all devices */}
+        <header className="text-center mb-6 sm:mb-8 lg:mb-10">
+          <a href="/" className="inline-block cursor-pointer hover:opacity-80 transition">
+            <img
+              src="/twor.png"
+              alt="founderNonstop"
+              className="h-16 sm:h-20 md:h-24 w-auto object-contain"
+            />
+          </a>
+          <p className="mt-4 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed px-2">
+            founderNonstop is a discovery platform for solo founders to explore apps and SaaS businesses making money, learn how they grew, and get practical growth tips to build and grow their own businesses.
+          </p>
+        </header>
 
-          {leftApps.length > 0 ? (
-            leftApps.map((app) => <AppCard key={app.id} app={app} />)
-          ) : (
-            <p className="py-4 text-sm text-slate-500">No apps published yet.</p>
-          )}
-        </aside>
+        {/* Mobile/Tablet view with tabs */}
+        <MobileContent posts={posts} apps={apps} />
 
-        <section className="order-2 min-w-0 lg:order-2">
-          <header className="text-center mb-6 sm:mb-8">
-            <a href="/" className="inline-block cursor-pointer hover:opacity-80 transition">
-              <img
-                src="/twor.png"
-                alt="founderNonstop"
-                className="h-16 sm:h-20 md:h-24 w-auto object-contain"
-              />
-            </a>
-          </header>
+        {/* Desktop view - 3 column grid */}
+        <div className="hidden md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:grid-cols-[minmax(0,1fr)_minmax(360px,1.4fr)_minmax(0,1fr)] md:gap-10 lg:gap-12 items-start">
+          <aside className="order-1 lg:order-1">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">
+              Apps
+            </h2>
 
-          <div className="text-center mb-6 sm:mb-8">
-            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed px-2">
-              founderNonstop is a discovery platform for solo founders to explore apps and SaaS businesses making money, learn how they grew, and get practical growth tips to build and grow their own businesses.
-            </p>
-          </div>
+            {leftApps.length > 0 ? (
+              leftApps.map((app) => <AppCard key={app.id} app={app} />)
+            ) : (
+              <p className="py-4 text-sm text-slate-500">No apps published yet.</p>
+            )}
+          </aside>
 
-          <section>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 mb-3 sm:mb-4">
+          <section className="order-2 min-w-0 lg:order-2">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
               Growth Tips for Founders
             </h1>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4">
               {posts.length > 0 ? (
                 posts.map((post) => <TipCard key={post.id} post={post} />)
               ) : (
@@ -120,19 +123,19 @@ export default async function Home() {
               )}
             </div>
           </section>
-        </section>
 
-        <aside className="order-3 lg:order-3">
-          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-slate-500 mb-3 sm:mb-4">
-            More apps
-          </h2>
+          <aside className="order-3 lg:order-3">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">
+              More apps
+            </h2>
 
-          {rightApps.length > 0 ? (
-            rightApps.map((app) => <AppCard key={app.id} app={app} />)
-          ) : (
-            <p className="py-4 text-sm text-slate-500">No apps published yet.</p>
-          )}
-        </aside>
+            {rightApps.length > 0 ? (
+              rightApps.map((app) => <AppCard key={app.id} app={app} />)
+            ) : (
+              <p className="py-4 text-sm text-slate-500">No apps published yet.</p>
+            )}
+          </aside>
+        </div>
       </div>
     </main>
   );
