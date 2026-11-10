@@ -4,14 +4,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Post = {
-  id: string;
-  title: string;
-  content: Array<{ subtitle?: string; content: string }> | string;
-  published: boolean;
-  created_at: string;
-};
-
 type App = {
   id: string;
   name: string;
@@ -28,20 +20,15 @@ type App = {
 };
 
 export default function PostPage() {
-  const [activeTab, setActiveTab] = useState<"create-tip" | "create-app" | "manage-tip" | "manage-app">("create-tip");
+  const [activeTab, setActiveTab] = useState<"create-app" | "manage-app">("create-app");
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [posts, setPosts] = useState<Post[]>([]);
   const [apps, setApps] = useState<App[]>([]);
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [editingApp, setEditingApp] = useState<App | null>(null);
   const [editingLogoPreview, setEditingLogoPreview] = useState<string | null>(null);
   const [editingLogoFile, setEditingLogoFile] = useState<File | null>(null);
   const [appSearchQuery, setAppSearchQuery] = useState("");
-  const [tipSlides, setTipSlides] = useState<Array<{ subtitle: string; content: string }>>([{ subtitle: "", content: "" }]);
-  const [editingTipSlides, setEditingTipSlides] = useState<Array<{ subtitle: string; content: string }>>([]);
-  const tipFormRef = useRef<HTMLFormElement>(null);
   const appFormRef = useRef<HTMLFormElement>(null);
 
   function handleLogoUpload(
@@ -137,17 +124,8 @@ export default function PostPage() {
     "mb-2 block text-sm font-medium text-slate-700";
 
   useEffect(() => {
-    fetchPosts();
     fetchApps();
   }, []);
-
-  async function fetchPosts() {
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setPosts(data || []);
-  }
 
   async function fetchApps() {
     const { data } = await supabase
@@ -158,34 +136,12 @@ export default function PostPage() {
     setApps(data || []);
   }
 
-  async function deletePost(id: string) {
-    const { error } = await supabase.from("posts").delete().eq("id", id);
-    if (error) {
-      alert("Failed to delete post: " + error.message);
-    } else {
-      await fetchPosts();
-    }
-  }
-
   async function deleteApp(id: string) {
     const { error } = await supabase.from("apps").delete().eq("id", id);
     if (error) {
       alert("Failed to delete app: " + error.message);
     } else {
       await fetchApps();
-    }
-  }
-
-  async function updatePost(post: Post) {
-    const { error } = await supabase
-      .from("posts")
-      .update({ title: post.title, content: post.content })
-      .eq("id", post.id);
-    if (error) {
-      alert("Failed to update post: " + error.message);
-    } else {
-      await fetchPosts();
-      setEditingPost(null);
     }
   }
 
@@ -240,23 +196,11 @@ export default function PostPage() {
           </h1>
 
           <p className="mt-2 text-sm text-slate-500">
-            Create and manage growth tips and app stories.
+            Create and manage app stories.
           </p>
         </header>
 
-        <div className="mb-8 grid grid-cols-2 sm:grid-cols-4 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
-          <button
-            type="button"
-            onClick={() => setActiveTab("create-tip")}
-            className={`rounded-lg px-3 py-3 text-xs sm:text-sm font-medium transition cursor-pointer ${
-              activeTab === "create-tip"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            Create Tip
-          </button>
-
+        <div className="mb-8 grid grid-cols-2 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
           <button
             type="button"
             onClick={() => setActiveTab("create-app")}
@@ -267,18 +211,6 @@ export default function PostPage() {
             }`}
           >
             Create App
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("manage-tip")}
-            className={`rounded-lg px-3 py-3 text-xs sm:text-sm font-medium transition cursor-pointer ${
-              activeTab === "manage-tip"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            Manage Tips
           </button>
 
           <button
@@ -295,118 +227,7 @@ export default function PostPage() {
         </div>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
-          {activeTab === "create-tip" ? (
-            <form
-              ref={tipFormRef}
-              className="space-y-6"
-              onSubmit={async (event) => {
-                event.preventDefault();
-                setIsSubmitting(true);
-
-                const formData = new FormData(event.currentTarget);
-                const title = formData.get("title") as string;
-                const validSlides = tipSlides.filter(slide => slide.content.trim().length > 0);
-
-                if (validSlides.length === 0) {
-                  alert("Please add at least one slide with content.");
-                  setIsSubmitting(false);
-                  return;
-                }
-
-                const { error } = await supabase
-                  .from("posts")
-                  .insert({ title, content: validSlides, published: true });
-
-                setIsSubmitting(false);
-
-                if (error) {
-                  alert("Failed to save post: " + error.message);
-                } else {
-                  alert("Growth tip published successfully!");
-                  tipFormRef.current?.reset();
-                  setTipSlides([{ subtitle: "", content: "" }]);
-                }
-              }}
-            >
-              <div>
-                <label htmlFor="tip-title" className={labelClass}>
-                  Title
-                </label>
-                <input
-                  id="tip-title"
-                  name="title"
-                  type="text"
-                  required
-                  maxLength={120}
-                  placeholder="e.g. Find customers before building"
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>
-                  Tip slides
-                </label>
-                <div className="space-y-3">
-                  {tipSlides.map((slide, index) => (
-                    <div key={index} className="relative space-y-2">
-                      <input
-                        type="text"
-                        value={slide.subtitle}
-                        onChange={(e) => {
-                          const newSlides = [...tipSlides];
-                          newSlides[index] = { ...newSlides[index], subtitle: e.target.value };
-                          setTipSlides(newSlides);
-                        }}
-                        placeholder={`Slide ${index + 1} subtitle (optional)`}
-                        className={`${inputClass} font-semibold`}
-                      />
-                      <textarea
-                        value={slide.content}
-                        onChange={(e) => {
-                          const newSlides = [...tipSlides];
-                          newSlides[index] = { ...newSlides[index], content: e.target.value };
-                          setTipSlides(newSlides);
-                        }}
-                        required={index === 0}
-                        minLength={10}
-                        rows={4}
-                        placeholder={`Slide ${index + 1} content: Share the lesson, strategy, or experience...`}
-                        className={`${inputClass} resize-y leading-6`}
-                      />
-                      {tipSlides.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newSlides = tipSlides.filter((_, i) => i !== index);
-                            setTipSlides(newSlides);
-                          }}
-                          className="rounded-lg bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200 cursor-pointer transition"
-                        >
-                          Remove slide
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setTipSlides([...tipSlides, { subtitle: "", content: "" }])}
-                    className="w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
-                  >
-                    + Add another slide
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer shadow-sm hover:shadow-md"
-              >
-                {isSubmitting ? "Publishing..." : "Publish tip"}
-              </button>
-            </form>
-          ) : activeTab === "create-app" ? (
+          {activeTab === "create-app" ? (
             <form
               ref={appFormRef}
               className="space-y-6"
@@ -605,141 +426,6 @@ export default function PostPage() {
                 {isSubmitting ? "Publishing..." : "Publish app story"}
               </button>
             </form>
-          ) : activeTab === "manage-tip" ? (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">Manage Tips</h2>
-              {posts.length === 0 ? (
-                <p className="text-center text-slate-500 py-10">No posts yet.</p>
-              ) : (
-                posts.map((post) => (
-                  <div
-                    key={post.id}
-                    className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    {editingPost?.id === post.id ? (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          value={editingPost.title}
-                          onChange={(e) =>
-                            setEditingPost({ ...editingPost, title: e.target.value })
-                          }
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
-                        />
-                        <div className="space-y-2">
-                          {editingTipSlides.map((slide, index) => (
-                            <div key={index} className="space-y-2">
-                              <input
-                                type="text"
-                                value={slide.subtitle}
-                                onChange={(e) => {
-                                  const newSlides = [...editingTipSlides];
-                                  newSlides[index] = { ...newSlides[index], subtitle: e.target.value };
-                                  setEditingTipSlides(newSlides);
-                                }}
-                                placeholder={`Slide ${index + 1} subtitle (optional)`}
-                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 font-semibold"
-                              />
-                              <textarea
-                                value={slide.content}
-                                onChange={(e) => {
-                                  const newSlides = [...editingTipSlides];
-                                  newSlides[index] = { ...newSlides[index], content: e.target.value };
-                                  setEditingTipSlides(newSlides);
-                                }}
-                                rows={3}
-                                placeholder={`Slide ${index + 1} content`}
-                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
-                              />
-                              {editingTipSlides.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const newSlides = editingTipSlides.filter((_, i) => i !== index);
-                                    setEditingTipSlides(newSlides);
-                                  }}
-                                  className="rounded-lg bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200 cursor-pointer transition"
-                                >
-                                  Remove slide
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => setEditingTipSlides([...editingTipSlides, { subtitle: "", content: "" }])}
-                            className="w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
-                          >
-                            + Add another slide
-                          </button>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              const validSlides = editingTipSlides.filter(slide => slide.content.trim().length > 0);
-                              updatePost({ ...editingPost, content: validSlides });
-                            }}
-                            className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 cursor-pointer shadow-sm"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditingPost(null);
-                              setEditingTipSlides([]);
-                            }}
-                            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <h3 className="font-semibold text-slate-900">
-                          {post.title}
-                        </h3>
-                        <p className="mt-1 text-sm text-slate-600 line-clamp-2">
-                          {Array.isArray(post.content) 
-                            ? (typeof post.content[0] === 'object' && post.content[0] !== null 
-                                ? post.content[0].content 
-                                : String(post.content[0]))
-                            : post.content}
-                        </p>
-                        <div className="mt-3 flex gap-2">
-                          <button
-                            onClick={() => {
-                              setEditingPost(post);
-                              if (Array.isArray(post.content)) {
-                                setEditingTipSlides(
-                                  post.content.map(s => {
-                                    if (typeof s === 'object' && s !== null) {
-                                      return { subtitle: s.subtitle || '', content: s.content };
-                                    }
-                                    return { subtitle: '', content: String(s) };
-                                  })
-                                );
-                              } else {
-                                setEditingTipSlides([{ subtitle: '', content: String(post.content) }]);
-                              }
-                            }}
-                            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => deletePost(post.id)}
-                            className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
           ) : (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-slate-900">Manage App Stories</h2>
@@ -909,7 +595,7 @@ export default function PostPage() {
         </section>
 
         <p className="mt-5 text-center text-xs leading-5 text-slate-400">
-          Posts are saved to Supabase and published immediately.
+          App stories are saved to Supabase and published immediately.
         </p>
       </div>
     </main>
