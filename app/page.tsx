@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import AppCard from "@/app/components/AppCard";
 import MobileContent from "@/app/components/MobileContent";
+import SEOContent from "@/app/components/SEOContent";
 import { Metadata } from "next";
 
 export const instant = false;
@@ -35,15 +36,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const appNames = apps.slice(0, 5).map(app => app.name).join(", ");
 
   return {
-    title: "founderNonstop - Learn from Successful Founders",
-    description: `Discover how ${appNames || 'successful founders'} grew their apps. Explore ${apps.length} real SaaS businesses making money.`,
+    title: "App Ideas & How to Grow Mobile Apps - founderNonstop",
+    description: `Discover profitable app ideas and learn how successful founders grew their mobile apps. Explore ${apps.length} real SaaS businesses making money with actionable growth strategies.`,
+    keywords: "app ideas, mobile app ideas, how to grow mobile apps, SaaS ideas, startup ideas, app growth strategies, profitable apps, solo founder",
     openGraph: {
-      title: "founderNonstop - Learn from Successful Founders",
-      description: `Discover how ${appNames || 'successful founders'} grew their apps. Explore ${apps.length} real SaaS businesses making money.`,
+      title: "App Ideas & How to Grow Mobile Apps - founderNonstop",
+      description: `Discover profitable app ideas and learn how successful founders grew their mobile apps. Explore ${apps.length} real SaaS businesses making money.`,
     },
     twitter: {
-      title: "founderNonstop - Learn from Successful Founders",
-      description: `Discover how ${appNames || 'successful founders'} grew their apps. Explore ${apps.length} real SaaS businesses making money.`,
+      title: "App Ideas & How to Grow Mobile Apps - founderNonstop",
+      description: `Discover profitable app ideas and learn how successful founders grew their mobile apps. Explore ${apps.length} real SaaS businesses making money.`,
     },
   };
 }
@@ -79,6 +81,9 @@ export default async function Home() {
             <p className="col-span-full py-4 text-sm text-slate-500">No apps published yet.</p>
           )}
         </div>
+
+        {/* SEO Content - collapsible at bottom */}
+        <SEOContent />
       </div>
     </main>
   );
